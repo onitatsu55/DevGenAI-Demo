@@ -1,4 +1,4 @@
-import json
+ import json
 
 import requests
 from bs4 import BeautifulSoup
@@ -22,14 +22,28 @@ def lambda_handler(event, context):
 
     contents = json.dumps(result, ensure_ascii=False)
 
-    response_body = {"application/json": {"body": contents}}
-    action_response = {
-        "actionGroup": event["actionGroup"],
-        "apiPath": event["apiPath"],
-        "httpMethod": event["httpMethod"],
-        "httpStatusCode": 200,
-        "responseBody": response_body,
+    response_body = {
+        'TEXT': {
+            'body': contents
+        }
     }
-    api_response = {"messageVersion": "1.0", "response": action_response}
-
-    return api_response
+            
+    function_response = {
+        'actionGroup': event['actionGroup'],
+        'function': event['function'],
+        'functionResponse': {
+            'responseBody': response_body
+        }
+    }
+    
+    session_attributes = event['sessionAttributes']
+    prompt_session_attributes = event['promptSessionAttributes']
+    
+    action_response = {
+        'messageVersion': '1.0', 
+        'response': function_response,
+        'sessionAttributes': session_attributes,
+        'promptSessionAttributes': prompt_session_attributes
+    }
+    
+    return action_response 
